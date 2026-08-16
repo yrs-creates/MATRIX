@@ -1,0 +1,26 @@
+{
+  "name": "pux-pilot",
+  "version": "1.0.0",
+  "description": "PUX PILOT — AI Co-Pilot Photo Editor with real-time design intelligence",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "photo-editor",
+    "ai-copilot",
+    "canvas",
+    "design-knowledge",
+    "groq",
+    "openrouter",
+    "gemini"
+  ],
+  "author": "Pux Pilot Team",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

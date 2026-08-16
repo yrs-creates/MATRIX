@@ -1,0 +1,162 @@
+{
+  "version": "2.0.0",
+  "title": "Pux Pilot Master Design Intelligence Brain",
+  "colorTheory": {
+    "principles": {
+      "complementary": "Colors opposite each other on the color wheel (e.g. Teal & Orange, Purple & Gold, Blue & Amber) generate maximum luminance contrast and vibrant visual energy.",
+      "analogous": "Colors situated adjacent to one another on the color wheel (e.g. Amber, Gold, and Orange) foster cohesive, serene, and harmonious atmospheric palettes.",
+      "triadic": "Three equidistant hues across the color wheel produce balanced dynamism with rich chromatic diversity (e.g. Red, Yellow, Blue).",
+      "monochromatic": "Variations of a single hue across lightness and saturation levels evoke sophisticated, clean, and understated elegance.",
+      "splitComplementary": "A base color paired with the two colors adjacent to its complement delivers nuanced contrast with less visual tension than pure complementary pairings.",
+      "ruleOf603010": "A time-tested palette balance: 60% dominant foundation tone, 30% supporting structural color, and 10% high-contrast accent pop.",
+      "colorTemperature": "Warm temperatures (3200K-4500K) create intimacy, nostalgia, and energy; cool temperatures (5500K-7500K) evoke tech, calm, clinical focus, and twilight moods."
+    },
+    "colorMeanings": {
+      "purple": ["creative", "luxury", "mysterious", "futuristic", "spiritual", "visionary"],
+      "cyan": ["technological", "clean", "fresh", "vibrant", "modern", "cyberpunk"],
+      "yellow": ["optimistic", "energetic", "attention-grabbing", "warm", "playful"],
+      "blue": ["trustworthy", "calm", "professional", "reliable", "serene", "stable"],
+      "red": ["urgent", "passionate", "powerful", "intense", "dynamic", "courageous"],
+      "green": ["organic", "growth", "balanced", "restful", "sustainable", "healing"],
+      "orange": ["friendly", "enthusiastic", "creative", "inviting", "adventurous"]
+    },
+    "commonMistakes": [
+      {
+        "id": "color_competing_saturation",
+        "category": "colorTheory",
+        "trigger": "saturation > 70 && layerCount > 2",
+        "issue": "Multiple highly saturated layers compete aggressively for focal dominance, causing ocular fatigue.",
+        "fix": "Apply the 60-30-10 rule: drop secondary layers to muted or neutral tones and let the hero layer own the saturation accent.",
+        "mentorTip": "In professional color grading, saturation is a scarce currency. Reserve peaks of +50% saturation strictly for your primary hero element.",
+        "friendlyTip": "Super vibrant colors! 🎨 To make your star subject really pop, try dialing down the background saturation just a bit.",
+        "roastTip": "My monitor is practically radiating gamma rays. Turn down that saturation before we need sunglasses! 🔥"
+      },
+      {
+        "id": "color_heavy_tint",
+        "category": "colorTheory",
+        "trigger": "Math.abs(tint) > 35",
+        "issue": "Severe green or magenta tint creates an unnatural color cast, degrading organic skin tones and neutral white points.",
+        "fix": "Recenter tint to the [-10, +10] corridor and use selective temperature or saturation adjustments instead.",
+        "mentorTip": "Tint shifts white balance along the green-magenta chromatic axis. Keep tint within ±10 to maintain accurate color calibration.",
+        "friendlyTip": "Dramatic mood! ✨ If skin tones look a bit green or pink, nudging tint back toward center will make them look fresh.",
+        "roastTip": "Did an alien invasion happen or is your tint slider just broken? Recenter that slider! 👽"
+      },
+      {
+        "id": "color_extreme_temperature",
+        "category": "colorTheory",
+        "trigger": "temperature > 50 || temperature < -50",
+        "issue": "Extreme color temperature suppresses the natural dynamic range, clipping subtle midtone textures into a flat monotone cast.",
+        "fix": "Soften temperature toward neutral (-20 to +20) to allow authentic midtone and shadow separation.",
+        "mentorTip": "Color temperature simulates kelvin white balance. Extreme shifts clip dynamic range. Maintain moderate warmth (+15 to +25) for natural golden hour tones.",
+        "friendlyTip": "Bold temperature choice! ❄️🔥 Softening it just slightly will bring out rich textures in the shadows.",
+        "roastTip": "Are we on the surface of the sun or Antarctica? Bring that temperature slider back to Earth! 🌡️"
+      },
+      {
+        "id": "color_neon_clash",
+        "category": "colorTheory",
+        "trigger": "saturation > 55 && contrast > 45",
+        "issue": "Simultaneous high saturation and harsh contrast produces digital clipping and abrasive chromatic fringe.",
+        "fix": "Moderate contrast to +15 to +25 and smooth tonal roll-off between highlights and midtones.",
+        "mentorTip": "High contrast paired with high chroma compresses the tonal gamut. Reduce contrast by 20 points for smooth filmic roll-off.",
+        "friendlyTip": "High voltage energy! ⚡ Dialing back contrast slightly will give you that high-end cinematic polish.",
+        "roastTip": "Whoa there neon warrior, easy on the contrast before you slice a hole in the canvas! 🔪"
+      }
+    ]
+  },
+  "composition": {
+    "principles": {
+      "ruleOfThirds": "Position primary subjects along the 1/3 or 2/3 horizontal and vertical grid lines to generate natural visual movement and dynamic equilibrium.",
+      "goldenRatio": "A proportional ratio of 1:1.618 (Phi) creates organic, harmoniously balanced layouts found throughout nature and classical art.",
+      "negativeSpace": "Ample breathing room around focal subjects emphasizes significance, elevates perceived luxury, and gives the viewer's eyes resting space.",
+      "visualBalance": "Distribute visual weight evenly using contrast, scale, and color density so the composition never feels lopsided.",
+      "leadingLines": "Lines, paths, and progressive tonal gradients direct the viewer's eye along an intentional trajectory toward the focal hero.",
+      "figureGround": "Clear luminance or chromatic separation between foreground elements and background context ensures instant visual parsing."
+    },
+    "commonMistakes": [
+      {
+        "id": "composition_dead_center_busy",
+        "category": "composition",
+        "trigger": "subjectCentered && isBusyBackground",
+        "issue": "Subject is statically centered within a visually noisy background without clear depth separation.",
+        "fix": "Use rule-of-thirds offset cropping or apply subtle background vignetting (+20 to +35) to focus the eye.",
+        "mentorTip": "Center composition demands absolute symmetry or minimalist backgrounds. In busy scenes, offset the subject along the 1/3 grid.",
+        "friendlyTip": "To make your hero subject pop out from a busy background, try adding a gentle vignette or shifting the crop! 📸",
+        "roastTip": "Your subject is lost in the background noise like Waldo in a candy factory. Center focus or add some depth! 🔍"
+      },
+      {
+        "id": "composition_cluttered_canvas",
+        "category": "composition",
+        "trigger": "layerCount > 5",
+        "issue": "Too many competing text, sticker, and shape layers clutter the visual hierarchy and disorient the viewer.",
+        "fix": "Consolidate or hide secondary elements, ensuring the primary subject occupies at least 40% of the visual attention.",
+        "mentorTip": "Perfection in design is achieved not when there is nothing more to add, but when there is nothing left to take away. Simplify secondary layers.",
+        "friendlyTip": "You have lots of awesome ideas! 🌟 Hiding one or two decorative layers will let your best elements shine even brighter.",
+        "roastTip": "Your canvas looks like a sticker explosion at a craft store. Time to declutter and let your design breathe! 🧹"
+      }
+    ]
+  },
+  "typography": {
+    "principles": {
+      "hierarchy": "Establish a 3-tier hierarchy: Headline (Display/Heavy 36-64px), Subhead (Medium 18-28px), and Caption/Detail (Regular 11-14px).",
+      "fontPairing": "Pair a high-character display or bold heading with a clean geometric or humanist sans-serif for crystal-clear readability.",
+      "contrastLegibility": "Maintain at least a 4.5:1 luminance contrast ratio (WCAG AA) between text and the underlying canvas pixels.",
+      "safeMargins": "Keep text at least 8-12% inward from canvas edges to prevent an uncomfortable trapped feeling and ensure mobile crop safety."
+    },
+    "commonMistakes": [
+      {
+        "id": "typography_edge_crowding",
+        "category": "typography",
+        "trigger": "textNearEdge",
+        "issue": "Text element is positioned too close to the canvas edge (<6% margin), producing visual claustrophobia.",
+        "fix": "Reposition text inward to maintain a minimum 10% safety margin from all canvas boundaries.",
+        "mentorTip": "Edge crowding violates typographic safe zones. Maintain a minimum 8-12% margin padding to preserve comfortable visual hierarchy.",
+        "friendlyTip": "Nice headline! ✍️ Nudging it inward from the edge gives it comfortable breathing room to stand out.",
+        "roastTip": "Your text is clinging to the border like it's terrified of the canvas. Give it some breathing room! 📐"
+      },
+      {
+        "id": "typography_poor_contrast",
+        "category": "typography",
+        "trigger": "textContrastLow",
+        "issue": "Text lacks sufficient luminance contrast against the underlying background, causing illegibility.",
+        "fix": "Add a subtle text drop shadow, outline stroke, or place a semi-transparent scrim shape beneath the typography.",
+        "mentorTip": "Legibility requires contrast separation. Apply a subtle drop shadow (blur: 6px, opacity: 0.6) or high-contrast stroke.",
+        "friendlyTip": "Want that headline to pop instantly? Adding a soft shadow or outline makes it super readable on any photo! ✨",
+        "roastTip": "I need binoculars to read that text. Slap a shadow or outline on it before your audience squints to death! 👀"
+      }
+    ]
+  },
+  "contrast": {
+    "principles": {
+      "dynamicRange": "Rich blacks, well-defined midtones, and smooth highlight roll-off create cinematic three-dimensionality.",
+      "vignetting": "Gentle peripheral light falloff (15-30%) naturally draws the viewer's gaze toward the center third without looking artificial."
+    },
+    "commonMistakes": [
+      {
+        "id": "contrast_flat_washed_out",
+        "category": "contrast",
+        "trigger": "contrast < -20 || (brightness > 30 && contrast < 0)",
+        "issue": "Low contrast and high brightness creates a flat, washed-out look lacking depth and tonal punch.",
+        "fix": "Boost contrast to +15 to +30 to anchor deep blacks and restore tonal dynamic range.",
+        "mentorTip": "A washed-out tonal curve reduces perceived depth. Anchor your black point by raising contrast to +20.",
+        "friendlyTip": "Boosting contrast just a touch will give your image rich depth and crisp detail! ⚡",
+        "roastTip": "Did we leave this photo out in the fog? Turn up the contrast and bring back some deep tones! 🌫️"
+      },
+      {
+        "id": "contrast_crushed_shadows",
+        "category": "contrast",
+        "trigger": "brightness < -30 && contrast > 30",
+        "issue": "Severe underexposure and high contrast crushes shadow textures into muddy, unrecoverable black pools.",
+        "fix": "Lift brightness by +15 and ease contrast back to +15 to +25 to reveal shadow texture.",
+        "mentorTip": "Crushing shadows destroys textural detail in low-key areas. Lift brightness or reduce contrast to preserve shadow gradation.",
+        "friendlyTip": "To bring back subtle hidden details in dark areas, try lifting brightness slightly! 💡",
+        "roastTip": "Half your image disappeared into a black hole. Lift the brightness before it is gone forever! 🕳️"
+      }
+    ]
+  },
+  "compositing": {
+    "principles": {
+      "contactShadows": "Ground subjects with soft contact ambient occlusion shadows matching the scene light angle.",
+      "ambientHarmonization": "Match color temperature, tint, and grain of inserted cutouts with the base image environment."
+    }
+  }
+}

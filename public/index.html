@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pux Pilot | Minimal AI Photo Editor with Fridii Emotion System</title>
+    <meta name="description" content="Pux Pilot is an intelligent AI co-pilot photo editor with dynamic knowledge injection, real-time offline rule evaluation, IDE-style co-pilot chat, and non-destructive canvas layers.">
+    
+    <!-- Styling & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased h-screen overflow-hidden flex flex-col select-none">
+
+    <div id="app-root" class="flex flex-col h-screen">
+        
+        <!-- ==========================================================================
+             ONBOARDING VIEW (WITH ANIME RAMEN BACKGROUND & TRANSPARENT GLASS BUTTON)
+             ========================================================================== -->
+        <div id="onboarding-view" class="flex-1 flex items-center justify-center p-6 relative overflow-hidden bg-slate-900" style="background-image: url('images/bg-anime-ramen.jpg'); background-size: cover; background-position: center;">
+            <!-- Dark Ambient Vignette & Backdrop Filter -->
+            <div class="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px]"></div>
+
+            <div class="w-full max-w-md backdrop-blur-2xl bg-slate-950/70 p-8 rounded-3xl shadow-2xl border border-white/20 relative z-10 text-white">
+                
+                <!-- Step 1: Registration / Login Card -->
+                <div id="registration-card" class="space-y-5">
+                    <div class="text-center">
+                        <div class="inline-flex items-center justify-center w-14 h-14 bg-white/10 text-cyan-400 border border-white/20 rounded-2xl mb-3 shadow-inner backdrop-blur-sm">
+                            <iconify-icon icon="lucide:layout" width="30"></iconify-icon>
+                        </div>
+                        <h1 id="auth-card-title" class="text-2xl font-bold tracking-tight text-white drop-shadow-sm">Welcome to Pux Pilot</h1>
+                        <p id="auth-card-subtitle" class="text-slate-300 text-xs mt-1 leading-relaxed">Your minimal, AI-assisted creative photo studio with the Fridii Emotion System.</p>
+                    </div>
+
+                    <!-- Error Alert Box -->
+                    <div id="auth-error-msg" class="hidden p-3 bg-red-500/20 border border-red-400/40 text-red-200 rounded-xl text-xs font-semibold leading-relaxed backdrop-blur-sm"></div>
+                    
+                    <form onsubmit="handleAuthSubmit(event)" class="space-y-3">
+                        <div id="auth-username-field">
+                            <label class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Username</label>
+                            <input type="text" id="reg-username" class="w-full px-4 py-2.5 mt-1 bg-white/10 border border-white/20 rounded-xl text-sm text-white placeholder-slate-400 outline-none focus:border-cyan-400 focus:bg-white/15 transition-all" placeholder="e.g. MasterCreator" value="CreativePilot">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Email</label>
+                            <input type="email" id="reg-email" class="w-full px-4 py-2.5 mt-1 bg-white/10 border border-white/20 rounded-xl text-sm text-white placeholder-slate-400 outline-none focus:border-cyan-400 focus:bg-white/15 transition-all" placeholder="pilot@pux.studio" value="pilot@pux.studio" required>
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Password</label>
+                            <input type="password" id="reg-pass" class="w-full px-4 py-2.5 mt-1 bg-white/10 border border-white/20 rounded-xl text-sm text-white placeholder-slate-400 outline-none focus:border-cyan-400 focus:bg-white/15 transition-all" placeholder="••••••••" value="photomagic123" required>
+                        </div>
+                        <!-- Transparent Glass Sign Up Button -->
+                        <button type="submit" id="auth-submit-btn" class="w-full glass-btn-transparent font-semibold py-3.5 rounded-xl transition-all duration-200 hover:scale-[1.02] mt-3 flex items-center justify-center gap-2 cursor-pointer">
+                            <span>Create Account</span>
+                            <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                        </button>
+                        <button type="button" id="auth-toggle-mode" class="w-full text-center text-xs text-cyan-300 hover:text-cyan-200 font-semibold py-1 transition-colors cursor-pointer">
+                            Already have an account? Sign In →
+                        </button>
+                        <button type="button" onclick="enterEditor()" class="w-full text-center text-xs text-slate-300 hover:text-white font-medium py-1 transition-colors cursor-pointer">
+                            Skip verification & Jump straight into editor →
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Step 2: Verification Quiz Card -->
+                <div id="quiz-card" class="hidden space-y-6">
+                    <div class="text-center">
+                        <div class="inline-flex items-center justify-center w-12 h-12 bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-2xl mb-2 backdrop-blur-sm">
+                            <iconify-icon icon="lucide:brain" width="26"></iconify-icon>
+                        </div>
+                        <h2 class="text-xl font-bold text-white">Verification Quiz</h2>
+                        <p class="text-slate-300 text-xs mt-1">Quick math skill check to verify human creativity!</p>
+                    </div>
+                    <div class="bg-white/10 border border-white/20 p-8 rounded-2xl text-center shadow-inner backdrop-blur-sm">
+                        <span class="text-4xl font-extrabold text-white tracking-wider">2 + 2 = ?</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="answerQuiz(false)" class="p-4 border border-white/20 bg-white/5 hover:bg-white/15 rounded-xl font-bold text-lg text-white transition-all">3</button>
+                        <button onclick="answerQuiz(true)" class="p-4 border border-cyan-400/50 bg-cyan-500/20 hover:bg-cyan-500/30 font-bold text-lg text-cyan-200 rounded-xl transition-all hover:scale-[1.02]">4</button>
+                        <button onclick="answerQuiz(false)" class="p-4 border border-white/20 bg-white/5 hover:bg-white/15 rounded-xl font-bold text-lg text-white transition-all">5</button>
+                        <button onclick="answerQuiz(false)" class="p-4 border border-white/20 bg-white/5 hover:bg-white/15 rounded-xl font-bold text-lg text-white transition-all">22</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Wrong Answer Meme Card (Shocked Dog) -->
+                <div id="wrong-ans-card" class="hidden space-y-5 text-center">
+                    <div class="rounded-2xl overflow-hidden border border-red-400/40 shadow-xl">
+                        <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/c3f2cd14-e474-474c-9455-88e689a1e113/1786869378175-3e14a692/shocked.jpg" alt="Shocked Dog" class="w-full h-56 object-cover" onerror="this.src='https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600'">
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-extrabold text-red-400">Brilliant, you are passed away in maths!! 💀</h2>
+                        <p class="text-slate-300 text-xs mt-1">That's okay! Visual artists don't need math anyway.</p>
+                    </div>
+                    <button onclick="enterEditor()" class="w-full bg-white/15 hover:bg-white/25 border border-white/30 text-white font-semibold py-3.5 rounded-xl transition-all shadow-md">
+                        Continue anyway →
+                    </button>
+                </div>
+
+                <!-- Step 4: Right Answer Meme Card (Pointing Cat) -->
+                <div id="right-ans-card" class="hidden space-y-5 text-center">
+                    <div class="rounded-2xl overflow-hidden border border-green-400/40 shadow-xl">
+                        <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/c3f2cd14-e474-474c-9455-88e689a1e113/1786869983520-f3328200/you_.jpg" alt="Pointing Cat" class="w-full h-56 object-cover" onerror="this.src='https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600'">
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-extrabold text-green-300">Developer failed in maths 😹</h2>
+                        <p class="text-slate-300 text-xs mt-1">Wait, that logic is weird, but you passed! Welcome to Pux Pilot.</p>
+                    </div>
+                    <button onclick="enterEditor()" class="w-full bg-cyan-500/30 hover:bg-cyan-500/40 border border-cyan-400/50 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-cyan-500/20">
+                        Start Creating 🚀
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================================================
+             MAIN EDITOR VIEW
+             ========================================================================== -->
+        <div id="editor-view" class="hidden flex-1 flex flex-col overflow-hidden">
+            
+            <!-- Topbar Navigation -->
+            <header class="h-14 border-b border-slate-200 bg-white flex items-center justify-between px-4 z-50 flex-shrink-0">
+                <div class="flex items-center gap-6">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center shadow-md shadow-blue-200">
+                            <iconify-icon icon="lucide:layout" width="18"></iconify-icon>
+                        </div>
+                        <span class="font-extrabold text-lg tracking-tight text-slate-900">Pux Pilot</span>
+                    </div>
+                    <nav class="flex items-center gap-2 text-xs font-semibold text-slate-500">
+                        <button onclick="triggerUpload()" class="px-2.5 py-1 rounded hover:bg-slate-100 hover:text-slate-900 transition-colors">File</button>
+                        <button onclick="resetAllAdjustments()" class="px-2.5 py-1 rounded hover:bg-slate-100 hover:text-slate-900 transition-colors">Reset Baseline</button>
+                        <button onclick="runAutoFix()" class="px-2.5 py-1 rounded hover:bg-slate-100 hover:text-slate-900 transition-colors">Auto-Fix ✨</button>
+                    </nav>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- Personality Selector -->
+                    <div class="relative flex items-center gap-2 bg-slate-100 hover:bg-slate-200/70 transition-colors px-3 py-1.5 rounded-full cursor-pointer">
+                        <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                        <select onchange="setPersonalityMode(this.value)" class="bg-transparent text-xs font-bold uppercase tracking-tight text-slate-700 outline-none cursor-pointer">
+                            <option value="friendly">Anime Mentor Mode</option>
+                            <option value="roast">Roast Master Mode (🔥)</option>
+                            <option value="mentor">Senior Director Mode</option>
+                            <option value="chaos">Chaos Glitch Mode (👾)</option>
+                        </select>
+                    </div>
+
+                    <!-- AI Status Badge -->
+                    <div id="ai-status-badge" class="hidden md:flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-full">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                        <span>AI & Rules Ready</span>
+                    </div>
+
+                    <!-- Export Button -->
+                    <button onclick="botCelebrate(); toggleExport()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-md shadow-blue-200 flex items-center gap-1.5">
+                        <iconify-icon icon="lucide:download"></iconify-icon>
+                        <span>Export</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Workspace Container -->
+            <div class="flex-1 flex overflow-hidden">
+                
+                <!-- Left Sidebar: Tools & Layers -->
+                <aside class="w-72 border-r border-slate-200 bg-white flex flex-col flex-shrink-0 z-20">
+                    <!-- Tool Icons Grid -->
+                    <div class="p-3 grid grid-cols-4 gap-2 border-b border-slate-100">
+                        <button class="tool-btn w-10 h-10 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 border border-blue-200 transition-all" data-tool="select" title="Select & Move Tool">
+                            <iconify-icon icon="lucide:mouse-pointer-2" width="18"></iconify-icon>
+                        </button>
+                        <button class="tool-btn w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 text-slate-700 border border-transparent transition-all" data-tool="crop" title="Crop Tool">
+                            <iconify-icon icon="lucide:crop" width="18"></iconify-icon>
+                        </button>
+                        <button onclick="triggerRotate()" class="tool-btn w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 text-slate-700 border border-transparent transition-all" title="Rotate 90°">
+                            <iconify-icon icon="lucide:rotate-cw" width="18"></iconify-icon>
+                        </button>
+                        <button class="tool-btn w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 text-slate-700 border border-transparent transition-all" data-tool="text" title="Add Text">
+                            <iconify-icon icon="lucide:type" width="18"></iconify-icon>
+                        </button>
+                        <button class="tool-btn w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 text-slate-700 border border-transparent transition-all" data-tool="shapes" title="Add Shapes">
+                            <iconify-icon icon="lucide:square" width="18"></iconify-icon>
+                        </button>
+                        <button class="tool-btn w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 text-slate-700 border border-transparent transition-all" data-tool="stickers" title="Stickers & Emojis">
+                            <iconify-icon icon="lucide:smile" width="18"></iconify-icon>
+                        </button>
+                        <button class="tool-btn w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 text-slate-700 border border-transparent transition-all" data-tool="brush" title="Brush Draw">
+                            <iconify-icon icon="lucide:brush" width="18"></iconify-icon>
+                        </button>
+                        <button onclick="triggerUpload()" class="tool-btn w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 text-slate-700 border border-transparent transition-all" title="Upload Photo">
+                            <iconify-icon icon="lucide:upload-cloud" width="18"></iconify-icon>
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Tool Subpanel -->
+                    <div id="tool-subpanel" class="hidden p-3 bg-slate-50/80 border-b border-slate-200/80 transition-all"></div>
+
+                    <!-- Non-Destructive Layers Section -->
+                    <div class="flex-1 flex flex-col overflow-hidden">
+                        <div class="px-4 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Layers Matrix</span>
+                            <button onclick="addTextLayerFromPanel()" class="text-slate-400 hover:text-blue-600 transition-colors" title="Add Layer">
+                                <iconify-icon icon="lucide:plus"></iconify-icon>
+                            </button>
+                        </div>
+                        <div id="layers-list" class="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
+                            <!-- Populated dynamically by app.js -->
+                            <div class="p-2.5 bg-blue-50 border border-blue-100 rounded-xl flex items-center gap-3">
+                                <div class="w-8 h-8 bg-blue-200 rounded-lg flex items-center justify-center text-blue-700 text-xs font-bold">BASE</div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold text-slate-800 truncate">Main Artwork</div>
+                                    <div class="text-[10px] text-slate-400">Master Canvas</div>
+                                </div>
+                                <iconify-icon icon="lucide:lock" class="text-slate-400 text-sm"></iconify-icon>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Center Canvas & Adjustments Drawer -->
+                <main class="flex-1 flex flex-col relative overflow-hidden">
+                    
+                    <!-- Viewport Canvas Area -->
+                    <div class="flex-1 canvas-area flex items-center justify-center p-6 relative overflow-hidden">
+                        
+                        <!-- Interactive Canvas Container -->
+                        <div id="canvas-container" class="relative shadow-2xl rounded-xl overflow-visible bg-white max-w-full max-h-[58vh]">
+                            <canvas id="main-canvas" class="block max-w-full max-h-[58vh] rounded-xl object-contain"></canvas>
+                            
+                            <!-- ==========================================================================
+                                 ANIME COMPANION BOT (FRIDII CO-PILOT WITH FULL EMOTION SYSTEM)
+                                 ========================================================================== -->
+                            <div id="anime-bot" class="absolute -right-36 bottom-6 z-50 flex flex-col items-center w-64 pointer-events-auto">
+                                
+                                <!-- Floating Speech Bubble -->
+                                <div class="speech-bubble mb-4 w-full text-center">
+                                    <span class="text-xs font-bold text-slate-700 leading-relaxed italic">
+                                        <span id="bot-emotion-prefix" class="text-blue-500 not-italic mr-1 font-bold">[IDLE]</span>
+                                        <span id="bot-speech">Nyaa~ let's make this masterpiece purrfect! ✨</span>
+                                    </span>
+                                </div>
+
+                                <!-- Fridii Nameplate -->
+                                <div class="text-xs font-black uppercase tracking-tighter mb-1 label-fridii">Fridii Co-Pilot</div>
+
+                                <!-- Interactive SVG Mascot Container -->
+                                <div id="mascot-container" class="w-32 h-44 relative animate-float group cursor-pointer drop-shadow-2xl" onclick="botJoke()">
+                                    <svg viewBox="0 0 100 120" class="w-full h-full" id="mascot-svg">
+                                        <!-- Tail -->
+                                        <path d="M80 85 Q95 70 85 50 Q75 30 90 10" fill="none" stroke="#f8bbd0" stroke-width="8" stroke-linecap="round" class="animate-tail" />
+                                        
+                                        <!-- Pigtails -->
+                                        <circle cx="25" cy="35" r="12" fill="#f8bbd0" />
+                                        <circle cx="75" cy="35" r="12" fill="#f8bbd0" />
+                                        
+                                        <!-- Head Box & Gradient -->
+                                        <defs>
+                                            <linearGradient id="faceGrad" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stop-color="#fce7f3" />
+                                                <stop offset="100%" stop-color="#f3e8ff" />
+                                            </linearGradient>
+                                        </defs>
+                                        <rect x="20" y="30" width="60" height="60" rx="25" fill="url(#faceGrad)" stroke="#f9a8d4" stroke-width="1.5" />
+                                        
+                                        <!-- Hair Highlight -->
+                                        <path d="M35 32 Q50 28 65 32" fill="none" stroke="white" stroke-width="2" opacity="0.6" />
+                                        
+                                        <!-- Blushes -->
+                                        <circle id="blush-left" cx="35" cy="65" r="5" class="mascot-blush" opacity="0.6" />
+                                        <circle id="blush-right" cx="65" cy="65" r="5" class="mascot-blush" opacity="0.6" />
+                                        
+                                        <!-- Celebrate Eyes (Visible in Celebrate/Yatta Mode) -->
+                                        <g id="celebrate-eyes" style="display:none;">
+                                            <path d="M32 55 Q38 48 44 55" fill="none" stroke="#4338ca" stroke-width="3" stroke-linecap="round" />
+                                            <path d="M56 55 Q62 48 68 55" fill="none" stroke="#4338ca" stroke-width="3" stroke-linecap="round" />
+                                        </g>
+                                        
+                                        <!-- Standard Animated Eyes Group -->
+                                        <g id="eyes-group" class="bot-eye" style="transition: all 0.4s ease;">
+                                            <g id="left-eye">
+                                                <ellipse cx="38" cy="55" rx="7" ry="10" fill="#4338ca" style="transition: all 0.4s ease;" />
+                                                <circle cx="36" cy="52" r="2.5" class="mascot-eye-shine" />
+                                                <path d="M31 48 Q38 45 45 48" fill="none" stroke="#1e293b" stroke-width="1.5" />
+                                            </g>
+                                            <g id="right-eye" style="transition: all 0.4s ease;">
+                                                <ellipse cx="62" cy="55" rx="7" ry="10" fill="#4338ca" style="transition: all 0.4s ease;" />
+                                                <circle cx="60" cy="52" r="2.5" class="mascot-eye-shine" />
+                                                <path d="M55 48 Q62 45 69 48" fill="none" stroke="#1e293b" stroke-width="1.5" />
+                                            </g>
+                                        </g>
+                                        
+                                        <!-- Sad Tears -->
+                                        <g id="tears-group" class="mascot-sad">
+                                            <circle cx="35" cy="70" r="2" fill="#60a5fa" />
+                                            <circle cx="65" cy="70" r="2" fill="#60a5fa" />
+                                        </g>
+                                        
+                                        <!-- Dynamic Mouth Curve -->
+                                        <path id="mouth-path" d="M45 75 Q50 78 55 75" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round" style="transition: all 0.4s ease;" />
+                                        
+                                        <!-- Thinking Hand Gesture -->
+                                        <g id="hand-group" opacity="0" style="transition: all 0.4s ease;">
+                                            <circle cx="65" cy="85" r="6" fill="#fff" stroke="#f9a8d4" stroke-width="1.5" />
+                                        </g>
+                                        
+                                        <!-- Body -->
+                                        <path d="M30 90 Q30 115 50 115 Q70 115 70 90" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5" />
+                                        
+                                        <!-- Paws -->
+                                        <circle cx="35" cy="95" r="4" fill="#fff" stroke="#f9a8d4" stroke-width="1.5" />
+                                        <circle cx="65" cy="95" r="4" fill="#fff" stroke="#f9a8d4" stroke-width="1.5" />
+                                    </svg>
+                                    
+                                    <!-- Hover Prompt Badge -->
+                                    <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-slate-900 text-white px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md">
+                                        Fridii: Tap for Jokes!
+                                    </div>
+                                    
+                                    <!-- Particle Emojis Container -->
+                                    <div id="mascot-emoji-container" class="absolute -top-10 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-none"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Drawer (Live Adjustments & Preset Filters) -->
+                    <div class="h-64 border-t border-slate-200 bg-white overflow-y-auto custom-scrollbar flex-shrink-0 z-10">
+                        <div class="flex px-6 py-2.5 border-b border-slate-100 justify-between items-center bg-white sticky top-0 z-20">
+                            <div class="flex gap-6">
+                                <button class="drawer-tab-btn text-xs font-bold text-blue-600 border-b-2 border-blue-600 pb-2 flex items-center gap-1.5 transition-colors" data-target="drawer-adjustments">
+                                    <iconify-icon icon="lucide:sliders"></iconify-icon> Adjustments
+                                </button>
+                                <button class="drawer-tab-btn text-xs font-bold text-slate-400 hover:text-slate-600 pb-2 flex items-center gap-1.5 transition-colors" data-target="drawer-filters">
+                                    <iconify-icon icon="lucide:palette"></iconify-icon> Preset Filters
+                                </button>
+                                <button class="drawer-tab-btn text-xs font-bold text-slate-400 hover:text-slate-600 pb-2 flex items-center gap-1.5 transition-colors" data-target="drawer-people">
+                                    <iconify-icon icon="lucide:user-plus"></iconify-icon> Add People
+                                </button>
+                                <button class="drawer-tab-btn text-xs font-bold text-slate-400 hover:text-slate-600 pb-2 flex items-center gap-1.5 transition-colors" data-target="drawer-vibe">
+                                    <iconify-icon icon="lucide:sparkles"></iconify-icon> Match Vibe
+                                </button>
+                            </div>
+                            <button onclick="resetAllAdjustments()" class="text-[11px] font-bold text-slate-400 hover:text-slate-700 flex items-center gap-1">
+                                <iconify-icon icon="lucide:rotate-ccw"></iconify-icon> Reset Sliders
+                            </button>
+                        </div>
+
+                        <!-- Adjustments Content Tab -->
+                        <div id="drawer-adjustments" class="drawer-tab-content p-6 flex flex-wrap gap-x-10 gap-y-6">
+                            <!-- BASIC LIGHT -->
+                            <section class="w-[calc(33.333%-20px)] min-w-[220px]">
+                                <header class="flex items-center gap-1.5 mb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                    <iconify-icon icon="lucide:sun" class="text-amber-500"></iconify-icon> Basic Light
+                                </header>
+                                <div class="space-y-3.5">
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between text-[11px] font-bold">
+                                            <label>Brightness</label><span id="val-brightness" class="text-blue-600">0</span>
+                                        </div>
+                                        <input type="range" id="slider-brightness" min="-100" max="100" value="0" class="w-full accent-blue-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between text-[11px] font-bold">
+                                            <label>Contrast</label><span id="val-contrast" class="text-blue-600">0</span>
+                                        </div>
+                                        <input type="range" id="slider-contrast" min="-100" max="100" value="0" class="w-full accent-blue-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between text-[11px] font-bold">
+                                            <label>Exposure</label><span id="val-exposure" class="text-blue-600">0</span>
+                                        </div>
+                                        <input type="range" id="slider-exposure" min="-100" max="100" value="0" class="w-full accent-blue-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- COLOR & TONE -->
+                            <section class="w-[calc(33.333%-20px)] min-w-[220px]">
+                                <header class="flex items-center gap-1.5 mb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                    <iconify-icon icon="lucide:droplets" class="text-blue-500"></iconify-icon> Color & Tone
+                                </header>
+                                <div class="space-y-3.5">
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between text-[11px] font-bold">
+                                            <label>Saturation</label><span id="val-saturation" class="text-blue-600">0</span>
+                                        </div>
+                                        <input type="range" id="slider-saturation" min="-100" max="100" value="0" class="w-full accent-blue-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between text-[11px] font-bold">
+                                            <label>Temperature</label><span id="val-temp" class="text-blue-600">0</span>
+                                        </div>
+                                        <input type="range" id="slider-temp" min="-100" max="100" value="0" class="w-full accent-blue-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between text-[11px] font-bold">
+                                            <label>Tint</label><span id="val-tint" class="text-blue-600">0</span>
+                                        </div>
+                                        <input type="range" id="slider-tint" min="-100" max="100" value="0" class="w-full accent-blue-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- STYLIZE & FOCUS -->
+                            <section class="w-[calc(33.333%-20px)] min-w-[220px]">
+                                <header class="flex items-center gap-1.5 mb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                    <iconify-icon icon="lucide:sparkles" class="text-purple-500"></iconify-icon> Stylize & Focus
+                                </header>
+                                <div class="space-y-3.5">
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between text-[11px] font-bold">
+                                            <label>Blur</label><span id="val-blur" class="text-blue-600">0</span>
+                                        </div>
+                                        <input type="range" id="slider-blur" min="0" max="30" value="0" class="w-full accent-blue-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between text-[11px] font-bold">
+                                            <label>Vignette</label><span id="val-vignette" class="text-blue-600">0</span>
+                                        </div>
+                                        <input type="range" id="slider-vignette" min="0" max="100" value="0" class="w-full accent-blue-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between text-[11px] font-bold">
+                                            <label>Sharpness</label><span id="val-sharpness" class="text-blue-600">0</span>
+                                        </div>
+                                        <input type="range" id="slider-sharpness" min="0" max="100" value="0" class="w-full accent-blue-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+
+                        <!-- Preset Filters Tab -->
+                        <div id="drawer-filters" class="drawer-tab-content hidden p-6">
+                            <div id="filters-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                                <!-- Populated dynamically by app.js -->
+                            </div>
+                        </div>
+
+                        <!-- Add People (Person Compositor) Tab -->
+                        <div id="drawer-people" class="drawer-tab-content hidden p-6">
+                            <!-- Populated dynamically by app.js -->
+                        </div>
+
+                        <!-- Match Vibe (Style Matcher) Tab -->
+                        <div id="drawer-vibe" class="drawer-tab-content hidden p-6">
+                            <!-- Populated dynamically by app.js -->
+                        </div>
+                    </div>
+                </main>
+
+                <!-- Right Sidebar: AI Analysis Stream & Co-Pilot Chat -->
+                <aside class="w-80 border-l border-slate-200 bg-white flex flex-col flex-shrink-0 z-20">
+                    
+                    <!-- Live AI Analysis Diagnostic Stream -->
+                    <div id="ai-diag-stream" class="h-32 border-b border-slate-100 p-4 mono text-[10px] space-y-1.5 overflow-y-auto custom-scrollbar text-slate-500 bg-slate-50/50">
+                        <div class="text-blue-600 font-bold">[AI ANALYZING] image_01.jpg</div>
+                        <div>Detection: Foreground element sharp & centered.</div>
+                        <div class="text-green-600 font-medium">✓ Color harmonics aligned.</div>
+                        <div class="text-slate-400">Suggestion: Rule of thirds alignment available.</div>
+                    </div>
+
+                    <!-- Chat Messages List -->
+                    <div id="chat-messages-container" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                        <div class="flex gap-3 pop-in">
+                            <div class="w-7 h-7 rounded-lg bg-pink-100 text-pink-600 flex items-center justify-center flex-shrink-0 text-sm">
+                                <iconify-icon icon="lucide:bot"></iconify-icon>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-100 p-3 rounded-2xl rounded-tl-none text-xs leading-relaxed text-slate-700">
+                                Looking sharp! Should we boost the vibrancy of those shadows, or would you like me to roast your design? 😉
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Action Chips & Input -->
+                    <div class="p-3 border-t border-slate-100 bg-white">
+                        <div class="flex flex-wrap gap-1.5 mb-2.5">
+                            <button onclick="runAnalysis()" class="text-[9px] font-bold uppercase bg-slate-50 hover:bg-blue-50 hover:text-blue-600 border border-slate-200 px-2 py-1 rounded transition-colors">Analyze 🔍</button>
+                            <button onclick="botRoast()" class="text-[9px] font-bold uppercase bg-slate-50 hover:bg-red-50 hover:text-red-600 border border-slate-200 px-2 py-1 rounded transition-colors">Roast Me 🔥</button>
+                            <button onclick="runAutoFix()" class="text-[9px] font-bold uppercase bg-slate-50 hover:bg-green-50 hover:text-green-600 border border-slate-200 px-2 py-1 rounded transition-colors">Auto-Fix ✨</button>
+                            <button onclick="runChaosWeird()" class="text-[9px] font-bold uppercase bg-slate-50 hover:bg-amber-50 hover:text-amber-600 border border-slate-200 px-2 py-1 rounded transition-colors">Make Weird 🌀</button>
+                        </div>
+                        <div class="relative">
+                            <input type="text" id="chat-input" placeholder="Ask Fridii anything..." class="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 transition-colors">
+                            <button onclick="handleChatMessage()" class="absolute right-2.5 top-2.5 text-blue-600 hover:text-blue-700">
+                                <iconify-icon icon="lucide:send" width="16"></iconify-icon>
+                            </button>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
+            <!-- Footer Status Bar -->
+            <footer class="h-8 border-t border-slate-200 bg-white flex items-center justify-between px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest flex-shrink-0">
+                <div class="flex items-center gap-6">
+                    <span id="status-dims">Dimensions: 1200x800</span>
+                    <span id="status-layer">Current: Base Artwork</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <iconify-icon icon="lucide:zap" class="text-blue-500 text-sm"></iconify-icon>
+                    <span id="status-xp">XP: 1,500</span>
+                    <span class="text-slate-300">|</span>
+                    <span id="status-level" class="text-slate-600">Novice Pilot</span>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Floating XP Toast Notification -->
+        <div id="xp-toast" class="fixed bottom-12 right-6 bg-slate-900 text-white px-4 py-2 rounded-full text-[10px] font-bold flex items-center gap-2 opacity-0 pointer-events-none transition-all shadow-xl z-50">
+            <iconify-icon icon="lucide:sparkles" class="text-yellow-400"></iconify-icon>
+            <span>+15 XP: CREATIVE ADJUSTMENT</span>
+        </div>
+
+        <!-- High-Res Export Modal -->
+        <div id="export-modal" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-slate-100 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                            <iconify-icon icon="lucide:download"></iconify-icon>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-sm">Export Masterpiece</h3>
+                    </div>
+                    <button onclick="closeExportModal()" class="text-slate-400 hover:text-slate-600">
+                        <iconify-icon icon="lucide:x"></iconify-icon>
+                    </button>
+                </div>
+
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="font-bold text-slate-500 uppercase tracking-wider text-[10px]">File Name</label>
+                        <input type="text" id="export-filename" value="pux-pilot-creation" class="w-full px-3 py-2 bg-slate-50 border rounded-lg mt-1 outline-none">
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Format</label>
+                        <select id="export-format" class="w-full px-3 py-2 bg-slate-50 border rounded-lg mt-1 outline-none">
+                            <option value="image/png">PNG (Lossless & Alpha)</option>
+                            <option value="image/jpeg">JPEG (High Quality Web)</option>
+                            <option value="image/webp">WebP (Ultra Compact)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Resolution Scale</label>
+                        <select id="export-scale" class="w-full px-3 py-2 bg-slate-50 border rounded-lg mt-1 outline-none">
+                            <option value="1">1x Standard (1200x800)</option>
+                            <option value="2">2x Retina HD (2400x1600)</option>
+                            <option value="4">4x Ultra 4K (4800x3200)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex gap-2">
+                    <button onclick="executeExport()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl shadow-md shadow-blue-200 transition-all text-xs flex items-center justify-center gap-1.5">
+                        <iconify-icon icon="lucide:sparkles"></iconify-icon>
+                        <span>Download Artwork</span>
+                    </button>
+                    <button onclick="closeExportModal()" class="px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition-all">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Application JavaScript Engine Libraries -->
+    <script src="js/sample-images.js"></script>
+    <script src="js/radar-chart.js"></script>
+    <script src="js/rules.js"></script>
+    <script src="js/gamification.js"></script>
+    <script src="js/canvas-engine.js"></script>
+    <script src="js/ai-client.js"></script>
+    <script src="js/style-matcher.js"></script>
+    <script src="js/person-compositor.js"></script>
+    <script src="js/mascot.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
