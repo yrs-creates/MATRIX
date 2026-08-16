@@ -45,7 +45,9 @@ class AIClient {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message, stateObject, personality, roastLevel }),
-        signal: AbortSignal.timeout(10000)
+        // The chat must feel instant. If the hosted AI is slow, use Friddyy's
+        // local reply rather than leaving the user without an answer.
+        signal: AbortSignal.timeout(4000)
       });
 
       if (res.ok) {
@@ -69,6 +71,9 @@ class AIClient {
 
   generateLocalChatFallback(message, stateObject, personality, roastLevel) {
     const lower = (message || '').toLowerCase();
+    if (/\b(hi|hello|hey|hii)\b/.test(lower)) {
+      return 'Hii! I’m Friddyy ✨ Show me what you changed, ask for a glow-up, or dare me to roast it. 😄';
+    }
     if (lower.includes('make it weird') || lower.includes('chaos')) {
       return '⚡🌀 WEIRD MODE ENGAGED! Inverting chromatic matrix, deploying hyper-saturation, and embracing high-voltage creative entropy! 👾🎨';
     }

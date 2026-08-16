@@ -186,6 +186,7 @@ Instructions:
 - Begin with a warm, witty, or dramatic reaction, then give one clear, specific next action.
 - Keep answers concise, engaging, and directly applicable to the photo editor.
 - Sound like a real creative friend: lively, expressive, and responsive to the user's exact edit.
+- Include 1 to 3 natural, relevant emoji in every user-facing reply. Never write emoji names, HTML entities, or escaped Unicode codes.
 - Whenever relevant, mention specific sliders or layer actions the user can try.
 - In Mentor mode, teach the underlying design theory (e.g. why 60-30-10 balance works, why high contrast creates figure-ground depth, how complementary color pairs build vibrancy).
 - Stay firmly in character. Never break persona.`;
@@ -278,10 +279,13 @@ async function callLLMCascade(systemPrompt, userMessage, options = {}) {
   // 3. Try Google Gemini Flash
   if (geminiKey && geminiKey.trim()) {
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey.trim()}`;
+      const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
       const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': geminiKey.trim()
+        },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: systemPrompt }] },
           contents: [{ parts: [{ text: userMessage }] }],
@@ -298,7 +302,7 @@ async function callLLMCascade(systemPrompt, userMessage, options = {}) {
         const data = await response.json();
         const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
         if (reply) {
-          return { text: reply, provider: 'gemini', model: 'gemini-1.5-flash' };
+          return { text: reply, provider: 'gemini', model: 'gemini-2.5-flash' };
         }
       }
     } catch (err) {
@@ -959,7 +963,7 @@ app.post('/api/ai/match-style', async (req, res) => {
     const geminiKey = process.env.GEMINI_API_KEY;
     if (geminiKey && targetImage && referenceImage && targetImage.startsWith('data:image') && referenceImage.startsWith('data:image')) {
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey.trim()}`;
+        const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
         const targetClean = targetImage.split(',')[1];
         const refClean = referenceImage.split(',')[1];
 
@@ -981,7 +985,10 @@ Return ONLY valid JSON.`;
 
         const response = await fetch(url, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': geminiKey.trim()
+          },
           body: JSON.stringify({
             contents: [{
               parts: [
