@@ -1,6 +1,6 @@
 /**
  * PUX PILOT — Master Application Coordinator
- * Coordinates Onboarding with Cat/Dog Memes, Fridii Emotion System,
+ * Coordinates Onboarding with Cat/Dog Memes, Friddyy's emotion system,
  * Live Adjustments, Filter Presets, Multi-layer Canvas, AI Chat, Auth,
  * Add People (Compositor), Match This Vibe (Style Matcher), and Auto-Activity Feed.
  */
@@ -81,7 +81,7 @@ function setAuthMode(mode) {
     if (toggleBtn) toggleBtn.innerText = "Don't have an account? Create one →";
   } else {
     if (title) title.innerText = 'Welcome to Pux Pilot';
-    if (subtitle) subtitle.innerText = 'Your minimal, AI-assisted creative photo studio with the Fridii Emotion System.';
+    if (subtitle) subtitle.innerText = 'Your minimal, AI-assisted creative photo studio with Friddyy.';
     if (userField) userField.classList.remove('hidden');
     if (submitBtn) submitBtn.innerHTML = `<span>Create Account</span><iconify-icon icon="lucide:arrow-right"></iconify-icon>`;
     if (toggleBtn) toggleBtn.innerText = 'Already have an account? Sign In →';
@@ -438,6 +438,60 @@ function initTools() {
       handleToolSwitch(toolType);
     });
   });
+}
+
+// These are intentionally global because the application shell uses inline
+// onclick handlers for the toolbar buttons.
+function triggerUpload() {
+  const picker = document.createElement('input');
+  picker.type = 'file';
+  picker.accept = 'image/png,image/jpeg,image/webp,image/gif';
+
+  picker.addEventListener('change', () => {
+    const file = picker.files && picker.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please choose an image file (PNG, JPG, WebP, or GIF).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.addEventListener('load', async () => {
+      try {
+        await window.CanvasEngine.loadImage(reader.result);
+        updateLayersList();
+        appendChatBubble('bot', `Ooh, fresh canvas! ${file.name} is loaded—give me one bold edit and I'll tell you exactly how to make it pop. ✨`);
+        if (window.Mascot) window.Mascot.setEmotion('happy', `New image loaded: ${file.name}!`);
+      } catch (error) {
+        console.error('Image import failed:', error);
+        alert('That image could not be loaded. Please try a different file.');
+      }
+    });
+    reader.readAsDataURL(file);
+  });
+
+  picker.click();
+}
+
+function botCelebrate() {
+  if (window.Mascot) window.Mascot.botCelebrate();
+}
+
+function botRoast() {
+  if (!window.Mascot) return;
+  const phrases = window.Mascot.ROAST_PHRASES || [];
+  const phrase = phrases.length ? phrases[Math.floor(Math.random() * phrases.length)] : 'That edit is so bold the undo button is hiding. 🔥 Give me another slider move—I dare you.';
+  window.Mascot.botRoast();
+  appendChatBubble('bot', phrase);
+}
+
+function botJoke() {
+  if (!window.Mascot) return;
+  const jokes = window.Mascot.JOKES || [];
+  const joke = jokes.length ? jokes[Math.floor(Math.random() * jokes.length)] : 'Why did the designer bring a ladder? To reach the next level! 😄';
+  window.Mascot.botJoke();
+  appendChatBubble('bot', joke);
 }
 
 function handleToolSwitch(toolType) {
@@ -897,12 +951,12 @@ async function handleChatMessage() {
   }
 
   if (lower.includes('joke') || lower.includes('funny')) {
-    if (window.Mascot) window.Mascot.botJoke();
+    botJoke();
     return;
   }
 
   if (lower.includes('roast') || lower.includes('burn')) {
-    if (window.Mascot) window.Mascot.botRoast();
+    botRoast();
     return;
   }
 
@@ -921,7 +975,7 @@ async function handleChatMessage() {
 
   try {
     const res = await window.AI.sendChat(message, state, personality, roastLevel);
-    const replyText = res.reply || res.text || "Ready to guide your next creative adjustment! ✨";
+    const replyText = res.reply || res.text || "I'm here! Give me an edit, a question, or ask me for a roast. ✨";
     appendChatBubble('bot', replyText);
 
     if (window.Mascot) {
@@ -1102,7 +1156,7 @@ function executeExport() {
   const filename = document.getElementById('export-filename')?.value || 'pux-pilot-creation';
 
   if (window.CanvasEngine) {
-    window.CanvasEngine.exportImage(format, scale, 0.95);
+    window.CanvasEngine.exportImage(format, scale, 0.95, filename);
     closeExportModal();
     if (window.Mascot) window.Mascot.botCelebrate();
     if (window.Gamification) {

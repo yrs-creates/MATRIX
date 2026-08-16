@@ -89,7 +89,7 @@ class AIClient {
     } else if (personality === 'chaos') {
       return 'WHY BE BALANCED WHEN YOU CAN BE ICONIC? Crank the tint, slap three stickers, and let the chaos reign! 🚀💥';
     } else {
-      return 'Looking great! Try exploring our preset filters or test out the "Make It Better" button for smart enhancement ideas! ✨';
+      return 'Ooh, I see the vibe! Try one bold slider move, then ask me to roast it or make it more cinematic. ✨';
     }
   }
 

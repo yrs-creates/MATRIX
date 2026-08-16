@@ -878,7 +878,7 @@ class CanvasEngine {
      EXPORT
      ========================================================================== */
 
-  exportImage(format = 'image/png', scale = 1, quality = 0.95) {
+  exportImage(format = 'image/png', scale = 1, quality = 0.95, filename = 'pux-pilot-creation') {
     if (!this.canvas) return;
 
     // Create high-res target canvas
@@ -894,12 +894,23 @@ class CanvasEngine {
     this.render();
     this.ctx = origCtx;
 
-    const dataUrl = exportCanvas.toDataURL(format, quality);
+    let dataUrl;
+    try {
+      dataUrl = exportCanvas.toDataURL(format, quality);
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Export failed because the current image does not allow browser downloads. Upload your image directly, then try again.');
+      return;
+    }
     const link = document.createElement('a');
     const ext = format === 'image/jpeg' ? 'jpg' : (format === 'image/webp' ? 'webp' : 'png');
-    link.download = `pux-pilot-export-${Date.now()}.${ext}`;
+    const cleanName = String(filename || 'pux-pilot-creation').trim().replace(/[\\/:*?\"<>|]+/g, '-') || 'pux-pilot-creation';
+    link.download = `${cleanName}.${ext}`;
     link.href = dataUrl;
+    link.style.display = 'none';
+    document.body.appendChild(link);
     link.click();
+    link.remove();
 
     if (window.Gamification) {
       window.Gamification.unlockAchievement('master_export');
